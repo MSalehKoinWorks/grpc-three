@@ -1,1 +1,1 @@
-This repository to cover https://koinworks.atlassian.net/browse/KB-1253 task
+This repository to cover https://koinworks.atlassian.net/browse/KB-1253 task (as client)
