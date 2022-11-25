@@ -22,12 +22,12 @@ func main() {
 	defer conn.Close()
 
 	for i := 1; i <= 25; i++ {
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Millisecond * 10)
 		doDeposit(conn, float32(i)*1000)
 	}
 
 	for i := 1; i <= 25; i++ {
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Millisecond * 10)
 		doWithdraw(conn, float32(i)*500)
 	}
 }
