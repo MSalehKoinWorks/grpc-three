@@ -4,14 +4,15 @@ option go_package = "github.com/MSalehKoinWorks/grpc-three/account";
 
 package account;
 
-message DepositRequest {
+message Req {
     float amount = 1;
 }
 
-message DepositResponse {
+message Res {
     bool ok = 1;
 }
 
 service DepositService {
-    rpc Deposit(DepositRequest) returns (DepositResponse) {}
+    rpc Deposit(Req) returns (Res) {}
+    rpc Withdraw(Req) returns (Res) {}
 }

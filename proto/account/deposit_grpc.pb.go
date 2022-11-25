@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DepositServiceClient interface {
-	Deposit(ctx context.Context, in *DepositRequest, opts ...grpc.CallOption) (*DepositResponse, error)
+	Deposit(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Res, error)
+	Withdraw(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Res, error)
 }
 
 type depositServiceClient struct {
@@ -33,9 +34,18 @@ func NewDepositServiceClient(cc grpc.ClientConnInterface) DepositServiceClient {
 	return &depositServiceClient{cc}
 }
 
-func (c *depositServiceClient) Deposit(ctx context.Context, in *DepositRequest, opts ...grpc.CallOption) (*DepositResponse, error) {
-	out := new(DepositResponse)
+func (c *depositServiceClient) Deposit(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Res, error) {
+	out := new(Res)
 	err := c.cc.Invoke(ctx, "/account.DepositService/Deposit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *depositServiceClient) Withdraw(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Res, error) {
+	out := new(Res)
+	err := c.cc.Invoke(ctx, "/account.DepositService/Withdraw", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +56,8 @@ func (c *depositServiceClient) Deposit(ctx context.Context, in *DepositRequest, 
 // All implementations must embed UnimplementedDepositServiceServer
 // for forward compatibility
 type DepositServiceServer interface {
-	Deposit(context.Context, *DepositRequest) (*DepositResponse, error)
+	Deposit(context.Context, *Req) (*Res, error)
+	Withdraw(context.Context, *Req) (*Res, error)
 	mustEmbedUnimplementedDepositServiceServer()
 }
 
@@ -54,8 +65,11 @@ type DepositServiceServer interface {
 type UnimplementedDepositServiceServer struct {
 }
 
-func (UnimplementedDepositServiceServer) Deposit(context.Context, *DepositRequest) (*DepositResponse, error) {
+func (UnimplementedDepositServiceServer) Deposit(context.Context, *Req) (*Res, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deposit not implemented")
+}
+func (UnimplementedDepositServiceServer) Withdraw(context.Context, *Req) (*Res, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Withdraw not implemented")
 }
 func (UnimplementedDepositServiceServer) mustEmbedUnimplementedDepositServiceServer() {}
 
@@ -71,7 +85,7 @@ func RegisterDepositServiceServer(s grpc.ServiceRegistrar, srv DepositServiceSer
 }
 
 func _DepositService_Deposit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DepositRequest)
+	in := new(Req)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -83,7 +97,25 @@ func _DepositService_Deposit_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/account.DepositService/Deposit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DepositServiceServer).Deposit(ctx, req.(*DepositRequest))
+		return srv.(DepositServiceServer).Deposit(ctx, req.(*Req))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DepositService_Withdraw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Req)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DepositServiceServer).Withdraw(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/account.DepositService/Withdraw",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DepositServiceServer).Withdraw(ctx, req.(*Req))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -98,6 +130,10 @@ var DepositService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Deposit",
 			Handler:    _DepositService_Deposit_Handler,
+		},
+		{
+			MethodName: "Withdraw",
+			Handler:    _DepositService_Withdraw_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
