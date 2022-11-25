@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/MSalehKoinWorks/grpc-three/account";
+
+package account;
+
+message DepositRequest {
+    float amount = 1;
+}
+
+message DepositResponse {
+    bool ok = 1;
+}
+
+service DepositService {
+    rpc Deposit(DepositRequest) returns (DepositResponse) {}
+}
