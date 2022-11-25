@@ -21,7 +21,19 @@ func main() {
 
 	defer conn.Close()
 
-	response, err := account.NewDepositClient(conn, time.Second).Deposit(context.Background(), 1000)
+	for i := 1; i <= 25; i++ {
+		time.Sleep(time.Second * 1)
+		doDeposit(conn, float32(i)*1000)
+	}
+
+	for i := 1; i <= 25; i++ {
+		time.Sleep(time.Second * 1)
+		doWithdraw(conn, float32(i)*500)
+	}
+}
+
+func doDeposit(conn *grpc.ClientConn, amount float32) {
+	response, err := account.NewDepositClient(conn, time.Second).Deposit(context.Background(), amount)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -32,4 +44,18 @@ func main() {
 	}
 
 	log.Println("Deposit success ...")
+}
+
+func doWithdraw(conn *grpc.ClientConn, amount float32) {
+	response, err := account.NewDepositClient(conn, time.Second).Withdraw(context.Background(), amount)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if !response {
+		log.Println("Withdraw failed ...")
+	}
+
+	log.Println("Withdraw success ...")
 }
